@@ -76,7 +76,7 @@ public class FindPetTest {
                         .jsonPath()
                         .get("category");
 
-        MatcherAssert.assertThat(category.get("id"), is(1));
+        MatcherAssert.assertThat(category.get("id"), is(3));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class FindPetTest {
                         .jsonPath()
                         .get("category");
 
-        MatcherAssert.assertThat(category.get("name"), is("Dogs"));
+        MatcherAssert.assertThat(category.get("name"), is("Rabbits"));
     }
 
     @Test
@@ -122,7 +122,7 @@ public class FindPetTest {
                         .jsonPath()
                         .get("name");
 
-        MatcherAssert.assertThat(petId, is("whiskers"));
+        MatcherAssert.assertThat(petId, is("Rabbit 1"));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class FindPetTest {
                         .jsonPath()
                         .get("status");
 
-        MatcherAssert.assertThat(petId, is("sold"));
+        MatcherAssert.assertThat(petId, is("available"));
     }
 
 
