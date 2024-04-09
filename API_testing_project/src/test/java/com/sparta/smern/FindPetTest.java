@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.MatcherAssert;
@@ -15,12 +16,14 @@ import java.util.Map;
 import static org.hamcrest.Matchers.is;
 
 public class FindPetTest {
-    public static final String BASE_URI = "http://localhost:8080";
-    public static final String BASE_PATH = "/api/v3";
+
+    public static final String BASE_PATH = ApiConfig.getBaseUri();
+    public static final String PET_PATH = ApiConfig.getCommonBasePath();
+    public static final String TOKEN = ApiConfig.getToken();
 
     private static RequestSpecBuilder getRequestSpecBuilder() {
         return new RequestSpecBuilder()
-                .setBaseUri(BASE_URI)
+                .setBaseUri(BASE_PATH)
                 .addHeaders(Map.of(
                 "Accept", "application/json"
                 ));
@@ -37,7 +40,7 @@ public class FindPetTest {
     @DisplayName("Check the id is correct")
     void checkId(){
         RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/pet/{pet_id}")
+                .setBasePath(BASE_PATH + PET_PATH +"/{pet_id}")
                 .addPathParam("pet_id", "10")
                 .build();
         Integer petId =
@@ -60,7 +63,7 @@ public class FindPetTest {
     @DisplayName("Check the category ID is correct")
     void checkCategory_Id() {
         RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/pet/{pet_id}")
+                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
                 .addPathParam("pet_id", "10")
                 .build();
         Map category =
@@ -83,7 +86,7 @@ public class FindPetTest {
     @DisplayName("Check the category name is correct")
     void checkCategory_Name() {
         RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/pet/{pet_id}")
+                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
                 .addPathParam("pet_id", "10")
                 .build();
         Map <String, String> category =
@@ -106,7 +109,7 @@ public class FindPetTest {
     @DisplayName("Check the name is correct")
     void checkName(){
         RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/pet/{pet_id}")
+                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
                 .addPathParam("pet_id", "10")
                 .build();
         String petId =
@@ -129,7 +132,7 @@ public class FindPetTest {
     @DisplayName("Check the status is correct")
     void checkStatus(){
         RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/pet/{pet_id}")
+                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
                 .addPathParam("pet_id", "10")
                 .build();
         String petId =
@@ -147,9 +150,5 @@ public class FindPetTest {
 
         MatcherAssert.assertThat(petId, is("available"));
     }
-
-
-
-
 
 }
