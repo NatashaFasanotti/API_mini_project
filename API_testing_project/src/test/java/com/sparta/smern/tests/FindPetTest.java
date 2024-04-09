@@ -1,5 +1,6 @@
-package com.sparta.smern;
+package com.sparta.smern.tests;
 
+import com.sparta.smern.ApiConfig;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
