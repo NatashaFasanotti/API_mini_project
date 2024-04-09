@@ -76,11 +76,11 @@ public class FindPetTest {
                         .jsonPath()
                         .get("category");
 
-        MatcherAssert.assertThat(category.get("id"), is(1));
+        MatcherAssert.assertThat(category.get("id"), is(3));
     }
 
     @Test
-    @DisplayName("Check the category ID is correct")
+    @DisplayName("Check the category name is correct")
     void checkCategory_Name() {
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + "/pet/{pet_id}")
@@ -99,11 +99,11 @@ public class FindPetTest {
                         .jsonPath()
                         .get("category");
 
-        MatcherAssert.assertThat(category.get("name"), is("Dogs"));
+        MatcherAssert.assertThat(category.get("name"), is("Rabbits"));
     }
 
     @Test
-    @DisplayName("Check the id is correct")
+    @DisplayName("Check the name is correct")
     void checkName(){
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + "/pet/{pet_id}")
@@ -122,11 +122,11 @@ public class FindPetTest {
                         .jsonPath()
                         .get("name");
 
-        MatcherAssert.assertThat(petId, is("whiskers"));
+        MatcherAssert.assertThat(petId, is("Rabbit 1"));
     }
 
     @Test
-    @DisplayName("Check the id is correct")
+    @DisplayName("Check the status is correct")
     void checkStatus(){
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + "/pet/{pet_id}")
@@ -145,7 +145,7 @@ public class FindPetTest {
                         .jsonPath()
                         .get("status");
 
-        MatcherAssert.assertThat(petId, is("sold"));
+        MatcherAssert.assertThat(petId, is("available"));
     }
 
 
