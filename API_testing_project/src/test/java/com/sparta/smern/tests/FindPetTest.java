@@ -1,6 +1,7 @@
 package com.sparta.smern.tests;
 
 import com.sparta.smern.ApiConfig;
+import com.sparta.smern.pojos.PetObject;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -44,7 +45,7 @@ public class FindPetTest {
                 .setBasePath(BASE_PATH + PET_PATH +"/{pet_id}")
                 .addPathParam("pet_id", "10")
                 .build();
-        Integer petId =
+        PetObject petIdentifier =
                 RestAssured
                         .given(requestSpec)
                         .when()
@@ -54,10 +55,9 @@ public class FindPetTest {
                             .spec(getJsonResponseWithStatus(200))
                             .log().all()
                             .extract()
-                            .jsonPath()
-                            .get("id");
+                            .as(PetObject.class);
 
-        MatcherAssert.assertThat(petId, is(10));
+        MatcherAssert.assertThat(petIdentifier.getId(), is(10));
     }
 
     @Test
