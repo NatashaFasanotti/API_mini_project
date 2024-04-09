@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.MatcherAssert;
@@ -17,13 +16,14 @@ import static org.hamcrest.Matchers.is;
 
 public class FindPetTest {
 
-    public static final String BASE_PATH = ApiConfig.getBaseUri();
+    public static final String BASE_URI = ApiConfig.getBaseUri();
+    public static final String BASE_PATH = ApiConfig.getBasePath();
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
     public static final String TOKEN = ApiConfig.getToken();
 
     private static RequestSpecBuilder getRequestSpecBuilder() {
         return new RequestSpecBuilder()
-                .setBaseUri(BASE_PATH)
+                .setBaseUri(BASE_URI)
                 .addHeaders(Map.of(
                 "Accept", "application/json"
                 ));

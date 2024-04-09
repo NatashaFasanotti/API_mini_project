@@ -29,6 +29,10 @@ public class ApiConfig {
         return properties.getProperty("api_token");
     }
 
+    public static String getBasePath() {
+        return properties.getProperty("base_path");
+    }
+
     public static String getCommonBasePath() {
         return properties.getProperty("common_base_path");
     }
