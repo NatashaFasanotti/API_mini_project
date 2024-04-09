@@ -6,6 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.MatcherAssert;
@@ -22,6 +23,21 @@ public class FindPetTest {
     public static final String BASE_PATH = ApiConfig.getBasePath();
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
     public static final String TOKEN = ApiConfig.getToken();
+
+    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
+        RequestSpecification requestSpec = getRequestSpecBuilder()
+                .setBasePath(BASE_PATH + PET_PATH + path)
+                .addPathParam("pet_id", "10")
+                .build();
+        return RestAssured
+                .given(requestSpec)
+                .when()
+                .log().all()
+                .get()
+                .then()
+                .spec(getJsonResponseWithStatus(200))
+                .log().all();
+    }
 
     private static RequestSpecBuilder getRequestSpecBuilder() {
         return new RequestSpecBuilder()
@@ -41,21 +57,12 @@ public class FindPetTest {
     @Test
     @DisplayName("Check the id is correct")
     void checkId(){
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH +"/{pet_id}")
-                .addPathParam("pet_id", "10")
-                .build();
-        PetObject petIdentifier =
-                RestAssured
-                        .given(requestSpec)
-                        .when()
-                            .log().all()
-                            .get()
-                        .then()
-                            .spec(getJsonResponseWithStatus(200))
-                            .log().all()
-                            .extract()
-                            .as(PetObject.class);
+        PetObject petIdentifier = setUpRequest("/{pet_id}",
+                Map.of(
+                        "pet_id", "10"
+                ))
+                .extract()
+                .as(PetObject.class);
 
         MatcherAssert.assertThat(petIdentifier.getId(), is(10));
     }
