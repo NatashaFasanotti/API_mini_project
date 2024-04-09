@@ -80,7 +80,7 @@ public class FindPetTest {
     }
 
     @Test
-    @DisplayName("Check the category ID is correct")
+    @DisplayName("Check the category name is correct")
     void checkCategory_Name() {
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + "/pet/{pet_id}")
@@ -103,7 +103,7 @@ public class FindPetTest {
     }
 
     @Test
-    @DisplayName("Check the id is correct")
+    @DisplayName("Check the name is correct")
     void checkName(){
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + "/pet/{pet_id}")
@@ -126,7 +126,7 @@ public class FindPetTest {
     }
 
     @Test
-    @DisplayName("Check the id is correct")
+    @DisplayName("Check the status is correct")
     void checkStatus(){
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + "/pet/{pet_id}")
