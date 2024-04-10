@@ -32,7 +32,7 @@ public class FindPetTest {
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
     private static final String PET_ID = "999";
 
-    private static Pet pet = new Pet(888, new Pet.Category(889, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
+    public static Pet pet = new Pet(888, new Pet.Category(889, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
             List.of(new Pet.Tag(887, "stringOfTag")), "available");
 
 
@@ -69,6 +69,7 @@ public class FindPetTest {
     @BeforeAll
     @DisplayName("Create a pet with a JSON body")
     static void createPetWithJsonBody() {
+        // Define the JSON body as a String or use a Map or POJO that will be serialized to JSON
         RequestSpecification requestSpec = new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
                 .addHeaders(Map.of(
@@ -81,6 +82,7 @@ public class FindPetTest {
 
         RestAssured
                 .given(requestSpec)
+                    //.body(jsonBody)
                 .when()
                     .post()
                 .then()
@@ -97,6 +99,7 @@ public class FindPetTest {
                 ))
                 .extract()
                 .as(PetObject.class);
+
         MatcherAssert.assertThat(petIdentifier.getId(), is(999));
 
     }
