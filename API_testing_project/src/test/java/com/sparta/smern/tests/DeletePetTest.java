@@ -71,7 +71,7 @@ public class DeletePetTest {
 
     @Test
     @DisplayName("Delete the newly created object")
-    public void deletePet(){
+    public void deletePetTest(){
         RequestSpecification deleteRequest = requestSpecBuilder()
                 .setBasePath(PET_PATH + "/" + pet.id())
                 .build();
@@ -82,6 +82,24 @@ public class DeletePetTest {
                 .delete();
 
         MatcherAssert.assertThat(result.getStatusCode(), is(200));
+    }
+
+    @Test
+    @DisplayName("Pet can not be retrieved")
+    public void irretrievablePetTest(){
+        RequestSpecification getPetRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH + "/" + pet.id())
+                .build();
+
+        Response response = RestAssured
+                .given(getPetRequest)
+                .when()
+                .get()
+                .then()
+                .extract().response();
+
+        // 404 Pet Not Found
+        MatcherAssert.assertThat(response.statusCode(), is(404));
     }
 
 }
