@@ -19,12 +19,13 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.is;
 
-public class CreateAccountTest {
+public class UpdateAccountTest {
 
     public static final String BASE_URI = ApiConfig.getBaseUri();
     public static final String BASE_PATH = ApiConfig.getBasePath();
     public static final String USER_PATH = ApiConfig.getUserPath();
-    public static Account account = new Account(99, "testUser", "Mrs", "Tester", "example@example.com", "testPassword", "0123456789", 1);
+    public static Account account = new Account(99, "testUser", "Miss", "Tester", "example@example.com", "testPassword", "0123456789", 1);
+    public static Account updatedAccount = new Account(99, "testUser", "Mrs", "MarriedTester", "example@example.com", "testPassword", "0123456789", 1);
     private static ValidatableResponse result;
     private static AccountObject testAccount;
 
@@ -77,7 +78,20 @@ public class CreateAccountTest {
         // API Request 1 - POST request to create a test account
         sendRequest(postRequest);
 
-        // API Request 2 - GET request to retrieve account details
+        // API Request 2 - PATCH request to update test account
+        RequestSpecification patchRequest = requestSpecBuilder()
+                .setBasePath(USER_PATH + "/" + account.username())
+                .build();
+        // Send in the account record
+        patchRequest.body(updatedAccount);
+        result = RestAssured
+                .given(patchRequest)
+                .when()
+                .put()
+                .then()
+                .spec(getJsonResponseWithStatus(200));
+
+        // API Request 3 - GET request to retrieve account details
         RequestSpecification getAccountRequest = requestSpecBuilder()
                 .setBasePath(USER_PATH + "/" + account.username())
                 .build();
@@ -95,37 +109,13 @@ public class CreateAccountTest {
     @Test
     @DisplayName("Correct firstName")
     void correctFirstNameTest(){
-        MatcherAssert.assertThat(testAccount.getFirstName(), is(account.firstName())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getFirstName(), is(updatedAccount.firstName())); // may need to recast the result as an int
     }
 
     @Test
     @DisplayName("Correct last name")
     void correctLastNameTest(){
-        MatcherAssert.assertThat(testAccount.getLastName(), is(account.lastName())); // may need to recast the result as an int
-    }
-
-    @Test
-    @DisplayName("Correct email")
-    void correctEmailTest(){
-        MatcherAssert.assertThat(testAccount.getEmail(), is(account.email())); // may need to recast the result as an int
-    }
-
-    @Test
-    @DisplayName("Correct password")
-    void correctPasswordTest(){
-        MatcherAssert.assertThat(testAccount.getPassword(), is(account.password())); // may need to recast the result as an int
-    }
-
-    @Test
-    @DisplayName("Correct phone")
-    void correctPhoneTest(){
-        MatcherAssert.assertThat(testAccount.getPhone(), is(account.phone())); // may need to recast the result as an int
-    }
-
-    @Test
-    @DisplayName("Correct user status")
-    void correctUserStatusTest(){
-        MatcherAssert.assertThat(testAccount.getUserStatus(), is(account.userStatus())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getLastName(), is(updatedAccount.lastName())); // may need to recast the result as an int
     }
 
 }
