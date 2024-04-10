@@ -66,8 +66,8 @@ public class UpdatePetTest {
     }
 
     @BeforeAll
-    @DisplayName("Create a pet with a JSON body")
-    public static void createPetWithJsonBody() {
+    @DisplayName("Create, Update & Get test pet")
+    public static void beforeAll() {
         // Build post request to create a test pet
         RequestSpecification postRequest = requestSpecBuilder()
                 .setBasePath(PET_PATH)

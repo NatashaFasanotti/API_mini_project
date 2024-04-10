@@ -1,8 +1,8 @@
 package com.sparta.smern.tests;
 
 import com.sparta.smern.ApiConfig;
-import com.sparta.smern.pojos.Category;
 import com.sparta.smern.pojos.PetObject;
+import com.sparta.smern.records.Pet;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -14,6 +14,7 @@ import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.*;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
@@ -23,98 +24,60 @@ public class DeletePetTest {
     public static final String BASE_URI = ApiConfig.getBaseUri();
     public static final String BASE_PATH = ApiConfig.getBasePath();
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
-    private static final String PET_ID = "888";
-    private static String jsonBody = """
-            {
-                "id": 888,
-                "category": {
-                    "id": 889,
-                    "name": "Dogs"
-                },
-                "name": "under_the_bed",
-                "photoUrls": [
-                    "stringOfPhotoUrl"
-                ],
-                "tags": [
-                    {
-                        "id": 887,
-                        "name": "stringOfTag"
-                    }
-                ],
-                "status": "available"
-            }
-           """;
+    public static Pet pet = new Pet(888, new Pet.Category(889, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
+            List.of(new Pet.Tag(886, "stringOfTag")), "available");
+    private static ValidatableResponse result;
+    private static PetObject testPet;
 
-    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH + path)
-                .addPathParam("pet_id", PET_ID)
-                .build();
-        return RestAssured
-                .given(requestSpec)
-                .when()
-                .log().all()
-                .get()
-                .then()
-                .spec(getJsonResponseWithStatus(200))
-                .log().all();
-    }
-
-    private static RequestSpecBuilder getRequestSpecBuilder() {
+    private static RequestSpecBuilder requestSpecBuilder() {
         return new RequestSpecBuilder()
-                .setBaseUri(BASE_URI)
+                .setBaseUri(BASE_URI + BASE_PATH)
                 .addHeaders(Map.of(
-                        "Accept", "application/json"
+                        "Accept", "application/json",
+                        "Content-Type", "application/json"
                 ));
     }
 
-    private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode){
+    private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode) {
         return new ResponseSpecBuilder()
                 .expectStatusCode(statusCode)
                 .expectContentType(ContentType.JSON)
                 .build();
     }
 
-
-    @BeforeAll
-    @DisplayName("Create a pet with a JSON body")
-    public static void createPetWithJsonBody() {
-        // Define the JSON body as a String or use a Map or POJO that will be serialized to JSON
-        RequestSpecification requestSpec = new RequestSpecBuilder()
-                .setBaseUri(BASE_URI)
-                .addHeaders(Map.of(
-                        "Accept", "application/json",
-                        "Content-Type", "application/json"
-                ))
-                .setBasePath(BASE_PATH + PET_PATH)
-                .build();
-
-        PetObject petIdentifier = RestAssured
-                .given(requestSpec)
-                .body(jsonBody)
+    private static void sendRequest(RequestSpecification request){
+        result = RestAssured
+                .given(request)
                 .when()
                 .post()
                 .then()
-                .spec(getJsonResponseWithStatus(200))
-                .extract()
-                .as(PetObject.class);
+                .spec(getJsonResponseWithStatus(200));
+    }
 
-        MatcherAssert.assertThat(petIdentifier.getId(), is(888));
+
+    @BeforeAll
+    @DisplayName("Create test pet")
+    public static void beforeAll() {
+        // Build post request to create a test pet
+        RequestSpecification postRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH)
+                .build();
+        // Send in the pet record
+        postRequest.body(pet);
+
+        sendRequest(postRequest);
+
     }
 
     @Test
     @DisplayName("Delete the newly created object")
     public void deletePet(){
-        RequestSpecification requestSpec = new RequestSpecBuilder()
-                .setBaseUri(BASE_URI)
-                .addHeaders(Map.of(
-                        "Accept", "application/json"
-                ))
-                .setBasePath(BASE_PATH + PET_PATH + "/" + PET_ID)
+        RequestSpecification deleteRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH + "/" + pet.id())
                 .build();
 
         Response result = RestAssured
-                .given(requestSpec)
+                .given(deleteRequest)
                 .when()
                 .delete();
 
