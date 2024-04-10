@@ -25,8 +25,67 @@ public class CreateAccountTest {
 
     public static final String BASE_URI = ApiConfig.getBaseUri();
     public static final String BASE_PATH = ApiConfig.getBasePath();
-    public static final String PET_PATH = ApiConfig.getCommonBasePath();
+    public static final String USER_PATH = ApiConfig.getUserPath();
     public static Account account = new Account(99, "testUser", "Mrs", "Tester", "example@example.com", "testPassword", "0123456789", 1);
     private static ValidatableResponse result;
     private static AccountObject testAccount;
+
+    private static RequestSpecBuilder requestSpecBuilder() {
+        return new RequestSpecBuilder()
+                .setBaseUri(BASE_URI + BASE_PATH)
+                .addHeaders(Map.of(
+                        "Accept", "application/json",
+                        "Content-Type", "application/json"
+                ));
+    }
+
+    private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode) {
+        return new ResponseSpecBuilder()
+                .expectStatusCode(statusCode)
+                .expectContentType(ContentType.JSON)
+                .build();
+    }
+
+    private static void sendRequest(RequestSpecification request){
+        result = RestAssured
+                .given(request)
+                .when()
+                .post()
+                .then()
+                .spec(getJsonResponseWithStatus(200));
+    }
+
+    public static void createPojo(RequestSpecification request){
+        testAccount = RestAssured
+                .given(request)
+                .when()
+                .get()
+                .then()
+                .spec(getJsonResponseWithStatus(200))
+                .extract()
+                .as(AccountObject.class);
+    }
+
+    @BeforeAll
+    @DisplayName("Create, Update & Get test pet")
+    public static void beforeAll() {
+        // Build post request to create a test account
+        RequestSpecification postRequest = requestSpecBuilder()
+                .setBasePath(USER_PATH)
+                .build();
+        // Send in the account record
+        postRequest.body(account);
+
+        // API Request 1 - POST request to create a test account
+        sendRequest(postRequest);
+
+        // API Request 2 - GET request to retrieve account details
+        RequestSpecification getAccountRequest = requestSpecBuilder()
+                .setBasePath(USER_PATH + "/" + account.id())
+                .build();
+
+        // create POJO for the test class to use
+        createPojo(getAccountRequest);
+    }
+
 }
