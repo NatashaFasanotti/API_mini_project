@@ -7,6 +7,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -49,18 +50,15 @@ public class UpdatePetTest {
                 .build();
         // Create the pet using the record
         requestSpec.body(pet);
-        // POST the pet and receive the pet info back as a response
-        // turn the response into a POJO
-        PetObject petIdentifier = RestAssured
+        // POST the pet and receive the pet info back as a response and check it has status of 200
+        ValidatableResponse result = RestAssured
                 .given(requestSpec)
                 .when()
                     .post()
                 .then()
-                    .spec(getJsonResponseWithStatus(200))
-                .extract()
-                    .as(PetObject.class);
+                    .spec(getJsonResponseWithStatus(200));
 
-        // send a new api request to create the pet again as a POJO
+        // send a new api request to retrieve the pet again as a POJO
         PetObject newPet = setUpRequest("/{pet_id}",
                 Map.of(
                         "pet_id", PET_ID
