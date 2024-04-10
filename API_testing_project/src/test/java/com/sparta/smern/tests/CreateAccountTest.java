@@ -81,11 +81,53 @@ public class CreateAccountTest {
 
         // API Request 2 - GET request to retrieve account details
         RequestSpecification getAccountRequest = requestSpecBuilder()
-                .setBasePath(USER_PATH + "/" + account.id())
+                .setBasePath(USER_PATH + "/" + account.username())
                 .build();
 
         // create POJO for the test class to use
         createPojo(getAccountRequest);
+    }
+
+    @Test
+    @DisplayName("Correct ID Test")
+    void correctIdTest(){
+        MatcherAssert.assertThat(testAccount.getId(), is(account.id())); // may need to recast the result as an int
+    }
+
+    @Test
+    @DisplayName("Correct firstName")
+    void correctFirstNameTest(){
+        MatcherAssert.assertThat(testAccount.getFirstName(), is(account.firstName())); // may need to recast the result as an int
+    }
+
+    @Test
+    @DisplayName("Correct last name")
+    void correctLastNameTest(){
+        MatcherAssert.assertThat(testAccount.getLastName(), is(account.lastName())); // may need to recast the result as an int
+    }
+
+    @Test
+    @DisplayName("Correct email")
+    void correctEmailTest(){
+        MatcherAssert.assertThat(testAccount.getEmail(), is(account.email())); // may need to recast the result as an int
+    }
+
+    @Test
+    @DisplayName("Correct password")
+    void correctPasswordTest(){
+        MatcherAssert.assertThat(testAccount.getPassword(), is(account.password())); // may need to recast the result as an int
+    }
+
+    @Test
+    @DisplayName("Correct phone")
+    void correctPhoneTest(){
+        MatcherAssert.assertThat(testAccount.getPhone(), is(account.phone())); // may need to recast the result as an int
+    }
+
+    @Test
+    @DisplayName("Correct user status")
+    void correctUserStatusTest(){
+        MatcherAssert.assertThat(testAccount.getUserStatus(), is(account.userStatus())); // may need to recast the result as an int
     }
 
 }
