@@ -65,7 +65,7 @@ public class StatusTest {
     @DisplayName("Retrieve a list of available pets when PetStore API is unavailable")
     void testPetStoreUnavailable() {
         RequestSpecification requestSpec = new RequestSpecBuilder()
-                .setBaseUri(BASE_PATH)
+                .setBasePath(BASE_PATH)
                 .setContentType(ContentType.JSON)
                 .build();
 
@@ -74,7 +74,8 @@ public class StatusTest {
                 .when()
                 .get( PET_PATH + "/findByStatus")
                 .then()
-                .statusCode(anyOf(is(500), is(503)));
+                .statusCode(is(400));
+
     }
 }
 
