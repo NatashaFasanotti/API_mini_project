@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -13,7 +14,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.hamcrest.Matchers.is;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
 
 public class FindPetTest {
 
@@ -44,8 +46,7 @@ public class FindPetTest {
                 .addPathParam("pet_id", "10")
                 .build();
         Integer petId =
-                RestAssured
-                        .given(requestSpec)
+                given(requestSpec)
                         .when()
                             .log().all()
                             .get()
@@ -67,8 +68,7 @@ public class FindPetTest {
                 .addPathParam("pet_id", "10")
                 .build();
         Map category =
-                RestAssured
-                        .given(requestSpec)
+                given(requestSpec)
                         .when()
                         .log().all()
                         .get()
@@ -90,8 +90,7 @@ public class FindPetTest {
                 .addPathParam("pet_id", "10")
                 .build();
         Map <String, String> category =
-                RestAssured
-                        .given(requestSpec)
+                given(requestSpec)
                         .when()
                         .log().all()
                         .get()
@@ -113,8 +112,7 @@ public class FindPetTest {
                 .addPathParam("pet_id", "10")
                 .build();
         String petId =
-                RestAssured
-                        .given(requestSpec)
+                given(requestSpec)
                         .when()
                         .log().all()
                         .get()
@@ -136,8 +134,7 @@ public class FindPetTest {
                 .addPathParam("pet_id", "10")
                 .build();
         String petId =
-                RestAssured
-                        .given(requestSpec)
+                given(requestSpec)
                         .when()
                         .log().all()
                         .get()
@@ -151,4 +148,41 @@ public class FindPetTest {
         MatcherAssert.assertThat(petId, is("available"));
     }
 
-}
+        @Test
+        @DisplayName("Retrieve  list of available pets successfully")
+        void retrieveAvailablePetsSuccessfully() {
+            RequestSpecification requestSpec = getRequestSpecBuilder()
+                    .setBasePath(BASE_PATH +PET_PATH+ "findByStatus")
+                    .addQueryParam("status", "available")
+                    .build();
+            given(requestSpec)
+                    .when()
+                    .log().all()
+                    .get()
+                    .then()
+                    .spec(getJsonResponseWithStatus(200))
+                    .log().all()
+                    .body("size()", greaterThan(0)) // Ensure the list is not empty
+                    .body("status", everyItem(is("available"))); // Check every item in the list has status "available"
+        }
+
+    @Test
+    @DisplayName("Retrieve a list of available pets when PetStore API is unavailable")
+    void testPetStoreUnavailable() {
+        RequestSpecification requestSpec = new RequestSpecBuilder()
+                .setBaseUri(BASE_PATH)
+                .setContentType(ContentType.JSON)
+                .build();
+        given()
+                .spec(requestSpec)
+                .when()
+                .get(PET_PATH)
+                .then()
+                .statusCode(isOneOf(500, 503));
+    }
+    }
+
+
+
+
+
