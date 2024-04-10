@@ -7,7 +7,6 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -27,7 +26,17 @@ public class UpdatePetTest {
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
     public static Pet pet = new Pet(777, new Pet.Category(779, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
             List.of(new Pet.Tag(776, "stringOfTag")), "available");
-    private static final int PET_ID = pet.id();
+    private static ValidatableResponse result;
+    private static PetObject testPet;
+
+    private static RequestSpecBuilder requestSpecBuilder() {
+        return new RequestSpecBuilder()
+                .setBaseUri(BASE_URI + BASE_PATH)
+                .addHeaders(Map.of(
+                        "Accept", "application/json",
+                        "Content-Type", "application/json"
+                ));
+    }
 
     private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode) {
         return new ResponseSpecBuilder()
@@ -36,72 +45,76 @@ public class UpdatePetTest {
                 .build();
     }
 
+    private static void sendRequest(RequestSpecification request){
+        result = RestAssured
+                .given(request)
+                .when()
+                .post()
+                .then()
+                .spec(getJsonResponseWithStatus(200));
+    }
+
+    public static void createPojo(RequestSpecification request){
+        testPet = RestAssured
+                .given(request)
+                .when()
+                    .get()
+                .then()
+                    .spec(getJsonResponseWithStatus(200))
+                    .extract()
+                    .as(PetObject.class);
+    }
+
     @BeforeAll
     @DisplayName("Create a pet with a JSON body")
     public static void createPetWithJsonBody() {
-        // Build the headers and URL
-        RequestSpecification requestSpec = new RequestSpecBuilder()
-                .setBaseUri(BASE_URI)
-                .addHeaders(Map.of(
-                        "Accept", "application/json",
-                        "Content-Type", "application/json"
-                ))
-                .setBasePath(BASE_PATH + PET_PATH)
+        // Build post request to create a test pet
+        RequestSpecification postRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH)
                 .build();
-        // Create the pet using the record
-        requestSpec.body(pet);
-        // POST the pet and receive the pet info back as a response and check it has status of 200
-        ValidatableResponse result = RestAssured
-                .given(requestSpec)
-                .when()
-                    .post()
-                .then()
-                    .spec(getJsonResponseWithStatus(200));
+        // Send in the pet record
+        postRequest.body(pet);
 
-        // send a new api request to retrieve the pet again as a POJO
-        PetObject petIdentifier = setUpRequest("/{pet_id}",
-                Map.of(
-                        "pet_id", PET_ID
+        // API Request 1 - POST request to create a test pet
+        sendRequest(postRequest);
+
+        // Build post request to update the test pet
+        RequestSpecification updatePetRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH + "/" + pet.id())
+                .addQueryParams(Map.of(
+                        "name", pet.name(),
+                        "status", "sold"
                 ))
-                .extract()
-                .as(PetObject.class);
-
-        MatcherAssert.assertThat(petIdentifier.getId(), is(PET_ID));
-    }
-
-    private static RequestSpecBuilder getRequestSpecBuilder() {
-        return new RequestSpecBuilder()
-                .setBaseUri(BASE_URI)
-                .addHeaders(Map.of(
-                        "Accept", "application/json"
-                ));
-    }
-
-    private static ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH + path)
-                .addPathParam("pet_id", PET_ID)
                 .build();
-        return RestAssured
-                .given(requestSpec)
-                .when()
-                .log().all()
-                .get()
-                .then()
-                .spec(getJsonResponseWithStatus(200))
-                .log().all();
+
+        // API Request 2 - POST request to UPDATE the pet details
+        sendRequest(updatePetRequest);
+
+        // API Request 3 - GET request to retrieve pet details
+        RequestSpecification getPetRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH + "/" + pet.id())
+                .build();
+
+        // create POJO for the test class to use
+        createPojo(getPetRequest);
     }
 
     @Test
-    @DisplayName("Check the id is correct")
-    void checkId(){
-        PetObject petIdentifier = setUpRequest("/{pet_id}",
-                Map.of(
-                        "pet_id", PET_ID
-                ))
-                .extract()
-                .as(PetObject.class);
-        MatcherAssert.assertThat(petIdentifier.getId(), is(PET_ID)); // may need to recast the result as an int
+    @DisplayName("Correct ID Test")
+    void correctIdTest(){
+        MatcherAssert.assertThat(testPet.getId(), is(pet.id())); // may need to recast the result as an int
+    }
+
+    @Test
+    @DisplayName("Correct Name Test")
+    public void correctNameTest() {
+        MatcherAssert.assertThat(testPet.getName(), is(pet.name()));
+    }
+
+    @Test
+    @DisplayName("Status has changed")
+    public void statusChangedTest() {
+        MatcherAssert.assertThat(testPet.getStatus(), is("sold"));
     }
 
 }
