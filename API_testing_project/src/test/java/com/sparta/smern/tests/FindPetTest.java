@@ -33,13 +33,32 @@ public class FindPetTest {
     public static final String TOKEN = ApiConfig.getToken();
 
     private static final String PET_ID = "999";
-    private static PetObject petIdentifier = new PetObject();
+//    private static String jsonBody = """
+//            {
+//                "id": 999,
+//                "category": {
+//                    "id": 998,
+//                    "name": "Dogs"
+//                },
+//                "name": "under_the_bed",
+//                "photoUrls": [
+//                    "stringOfPhotoUrl"
+//                ],
+//                "tags": [
+//                    {
+//                        "id": 997,
+//                        "name": "stringOfTag"
+//                    }
+//                ],
+//                "status": "available"
+//            }
+//           """;
 
-    private static Pet pet = new Pet(888, new Pet.Category(889, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
+    public static Pet pet = new Pet(888, new Pet.Category(889, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
             List.of(new Pet.Tag(887, "stringOfTag")), "available");
 
 
-    private static ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
+    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + PET_PATH + path)
                 .addPathParam("pet_id", PET_ID)
@@ -73,6 +92,7 @@ public class FindPetTest {
     @BeforeAll
     @DisplayName("Create a pet with a JSON body")
     static void createPetWithJsonBody() {
+        // Define the JSON body as a String or use a Map or POJO that will be serialized to JSON
         RequestSpecification requestSpec = new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
                 .addHeaders(Map.of(
@@ -85,18 +105,11 @@ public class FindPetTest {
 
         RestAssured
                 .given(requestSpec)
+                    //.body(jsonBody)
                 .when()
                     .post()
                 .then()
                     .spec(getJsonResponseWithStatus(200));
-
-        petIdentifier = setUpRequest("/{pet_id}",
-                Map.of(
-                        "pet_id", PET_ID
-                ))
-                .extract()
-                .as(PetObject.class);
-
     }
 
 
@@ -105,6 +118,14 @@ public class FindPetTest {
     @Test
     @DisplayName("Check the id is correct")
     void checkId(){
+        PetObject petIdentifier = setUpRequest("/{pet_id}",
+                Map.of(
+                        "pet_id", PET_ID
+                ))
+                .extract()
+                .as(PetObject.class);
+
+
         MatcherAssert.assertThat(petIdentifier.getId(), is(999));
 
     }
