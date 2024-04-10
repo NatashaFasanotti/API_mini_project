@@ -38,7 +38,7 @@ public class UpdatePetTest {
     @BeforeAll
     @DisplayName("Create a pet with a JSON body")
     public static void createPetWithJsonBody() {
-        // Define the JSON body as a String or use a Map or POJO that will be serialized to JSON
+        // Build the headers and URL
         RequestSpecification requestSpec = new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
                 .addHeaders(Map.of(
@@ -47,8 +47,10 @@ public class UpdatePetTest {
                 ))
                 .setBasePath(BASE_PATH + PET_PATH)
                 .build();
+        // Create the pet using the record
         requestSpec.body(pet);
-
+        // POST the pet and receive the pet info back as a response
+        // turn the response into a POJO
         PetObject petIdentifier = RestAssured
                 .given(requestSpec)
                 .when()
@@ -58,6 +60,7 @@ public class UpdatePetTest {
                 .extract()
                     .as(PetObject.class);
 
+        // send a new api request to create the pet again as a POJO
         PetObject newPet = setUpRequest("/{pet_id}",
                 Map.of(
                         "pet_id", PET_ID
