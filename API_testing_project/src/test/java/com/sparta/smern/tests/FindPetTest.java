@@ -1,6 +1,7 @@
 package com.sparta.smern.tests;
 
 import com.sparta.smern.ApiConfig;
+import com.sparta.smern.pojos.Category;
 import com.sparta.smern.pojos.PetObject;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -12,6 +13,8 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,10 +30,32 @@ public class FindPetTest {
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
     public static final String TOKEN = ApiConfig.getToken();
 
+    private static final String PET_ID = "999";
+    private static String jsonBody = """
+            {
+                "id": 999,
+                "category": {
+                    "id": 998,
+                    "name": "Dogs"
+                },
+                "name": "under_the_bed",
+                "photoUrls": [
+                    "stringOfPhotoUrl"
+                ],
+                "tags": [
+                    {
+                        "id": 997,
+                        "name": "stringOfTag"
+                    }
+                ],
+                "status": "available"
+            }
+           """;
+
     private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + PET_PATH + path)
-                .addPathParam("pet_id", "10")
+                .addPathParam("pet_id", PET_ID)
                 .build();
         return RestAssured
                 .given(requestSpec)
@@ -57,106 +82,125 @@ public class FindPetTest {
                 .build();
     }
 
+
+    @BeforeAll
+    @DisplayName("Create a pet with a JSON body")
+    static void createPetWithJsonBody() {
+        // Define the JSON body as a String or use a Map or POJO that will be serialized to JSON
+        RequestSpecification requestSpec = new RequestSpecBuilder()
+                .setBaseUri(BASE_URI)
+                .addHeaders(Map.of(
+                        "Accept", "application/json",
+                        "Content-Type", "application/json"
+                ))
+                .setBasePath(BASE_PATH + PET_PATH)
+                .build();
+
+        RestAssured
+                .given(requestSpec)
+                    .body(jsonBody)
+                .when()
+                    .post()
+                .then()
+                    .spec(getJsonResponseWithStatus(200));
+    }
+
+
+
+
     @Test
     @DisplayName("Check the id is correct")
     void checkId(){
         PetObject petIdentifier = setUpRequest("/{pet_id}",
                 Map.of(
-                        "pet_id", "10"
+                        "pet_id", PET_ID
                 ))
                 .extract()
                 .as(PetObject.class);
 
 
-        MatcherAssert.assertThat(petIdentifier.getId(), is(10));
+        MatcherAssert.assertThat(petIdentifier.getId(), is(999));
+
     }
 
     @Test
     @DisplayName("Check the category ID is correct")
     void checkCategory_Id() {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
-                .addPathParam("pet_id", "10")
-                .build();
-        Map category =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .get("category");
 
-        MatcherAssert.assertThat(category.get("id"), is(3));
+        Category categoryIdentifier = setUpRequest("/{pet_id}",
+                Map.of(
+                        "pet_id", PET_ID
+                ))
+                .extract()
+                .as(PetObject.class)
+                .getCategory();
+           MatcherAssert.assertThat(categoryIdentifier.getId(), is(998));
+
     }
 
     @Test
     @DisplayName("Check the category name is correct")
     void checkCategory_Name() {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
-                .addPathParam("pet_id", "10")
-                .build();
-        Map<String, String> category =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .get("category");
 
-        MatcherAssert.assertThat(category.get("name"), is("Rabbits"));
+        Category categoryIdentifier = setUpRequest("/{pet_id}",
+                Map.of(
+                        "pet_id", PET_ID
+                ))
+                .extract()
+                .as(PetObject.class)
+                .getCategory();
+        MatcherAssert.assertThat(categoryIdentifier.getName(), is("Dogs"));
+
     }
 
     @Test
     @DisplayName("Check the name is correct")
-    void checkName() {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
-                .addPathParam("pet_id", "10")
-                .build();
-        String petId =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .get("name");
 
-        MatcherAssert.assertThat(petId, is("Rabbit 1"));
+    void checkName(){
+        PetObject petIdentifier = setUpRequest("/{pet_id}",
+                Map.of(
+                        "pet_id", PET_ID
+                ))
+                .extract()
+                .as(PetObject.class);
+
+        MatcherAssert.assertThat(petIdentifier.getName(), is("under_the_bed"));
+
     }
 
     @Test
     @DisplayName("Check the status is correct")
-    void checkStatus() {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
-                .addPathParam("pet_id", "10")
-                .build();
-        String petId =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .get("status");
 
-        MatcherAssert.assertThat(petId, is("available"));
+    void checkStatus(){
+        PetObject petIdentifier = setUpRequest("/{pet_id}",
+                Map.of(
+                        "pet_id", PET_ID
+                ))
+                .extract()
+                .as(PetObject.class);
+
+        MatcherAssert.assertThat(petIdentifier.getStatus(), is("available"));
+    }
+
+    @AfterAll
+    @DisplayName("Delete the newly created object - teardown")
+    static void tearDown(){
+        RequestSpecification requestSpec = new RequestSpecBuilder()
+                .setBaseUri(BASE_URI)
+                .addHeaders(Map.of(
+                        "Accept", "application/json"
+                ))
+                .setBasePath(BASE_PATH + PET_PATH + "/" + PET_ID)
+                .build();
+
+        RestAssured
+                .given(requestSpec)
+                .when()
+                .delete()
+                .then()
+                .spec(getJsonResponseWithStatus(200));
+
+
     }
 }
 
