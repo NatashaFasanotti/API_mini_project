@@ -105,9 +105,6 @@ public class FindPetTest {
                     .spec(getJsonResponseWithStatus(200));
     }
 
-
-
-
     @Test
     @DisplayName("Check the id is correct")
     void checkId(){
