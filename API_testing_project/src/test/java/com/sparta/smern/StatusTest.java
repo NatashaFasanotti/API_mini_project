@@ -57,7 +57,7 @@ public class StatusTest {
                         .then()
                         .spec(getJsonResponseWithStatus(200))
                         .log().all();
-        response.body("size()", greaterThan(0)); // Ensure the list is not empty
+        response.body("size()", greaterThan(0));
         response.body("status", everyItem(is("available")));
     }
 
