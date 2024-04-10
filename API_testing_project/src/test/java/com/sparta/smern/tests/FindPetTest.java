@@ -30,16 +30,13 @@ public class FindPetTest {
     public static final String BASE_URI = ApiConfig.getBaseUri();
     public static final String BASE_PATH = ApiConfig.getBasePath();
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
-    public static final String TOKEN = ApiConfig.getToken();
-
     private static final String PET_ID = "999";
-    private static PetObject petIdentifier = new PetObject();
 
     private static Pet pet = new Pet(888, new Pet.Category(889, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
             List.of(new Pet.Tag(887, "stringOfTag")), "available");
 
 
-    private static ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
+    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + PET_PATH + path)
                 .addPathParam("pet_id", PET_ID)
@@ -69,7 +66,6 @@ public class FindPetTest {
                 .build();
     }
 
-
     @BeforeAll
     @DisplayName("Create a pet with a JSON body")
     static void createPetWithJsonBody() {
@@ -90,21 +86,17 @@ public class FindPetTest {
                 .then()
                     .spec(getJsonResponseWithStatus(200));
 
-        petIdentifier = setUpRequest("/{pet_id}",
+    }
+
+    @Test
+    @DisplayName("Check the id is correct")
+    void checkId(){
+        PetObject petIdentifier = setUpRequest("/{pet_id}",
                 Map.of(
                         "pet_id", PET_ID
                 ))
                 .extract()
                 .as(PetObject.class);
-
-    }
-
-
-
-
-    @Test
-    @DisplayName("Check the id is correct")
-    void checkId(){
         MatcherAssert.assertThat(petIdentifier.getId(), is(999));
 
     }
