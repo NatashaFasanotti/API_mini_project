@@ -11,6 +11,7 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -116,6 +117,22 @@ public class UpdateAccountTest {
     @DisplayName("Correct last name")
     void correctLastNameTest(){
         MatcherAssert.assertThat(testAccount.getLastName(), is(updatedAccount.lastName())); // may need to recast the result as an int
+    }
+
+    @AfterAll
+    @DisplayName("Delete Test Account after all")
+    public static void afterAll() {
+        RequestSpecification deleteRequest = requestSpecBuilder()
+                .setBasePath(USER_PATH + "/" + account.username())
+                .build();
+
+        result = RestAssured
+                .given(deleteRequest)
+                .when()
+                .delete()
+                .then()
+                .spec(getJsonResponseWithStatus(200));
+
     }
 
 }
