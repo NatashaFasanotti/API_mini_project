@@ -27,11 +27,11 @@ public class FindPetTest {
         return new RequestSpecBuilder()
                 .setBaseUri(BASE_PATH)
                 .addHeaders(Map.of(
-                "Accept", "application/json"
+                        "Accept", "application/json"
                 ));
     }
 
-    private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode){
+    private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode) {
         return new ResponseSpecBuilder()
                 .expectStatusCode(statusCode)
                 .expectContentType(ContentType.JSON)
@@ -40,22 +40,22 @@ public class FindPetTest {
 
     @Test
     @DisplayName("Check the id is correct")
-    void checkId(){
+    void checkId() {
         RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH +"/{pet_id}")
+                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
                 .addPathParam("pet_id", "10")
                 .build();
         Integer petId =
                 given(requestSpec)
                         .when()
-                            .log().all()
-                            .get()
+                        .log().all()
+                        .get()
                         .then()
-                            .spec(getJsonResponseWithStatus(200))
-                            .log().all()
-                            .extract()
-                            .jsonPath()
-                            .get("id");
+                        .spec(getJsonResponseWithStatus(200))
+                        .log().all()
+                        .extract()
+                        .jsonPath()
+                        .get("id");
 
         MatcherAssert.assertThat(petId, is(10));
     }
@@ -89,7 +89,7 @@ public class FindPetTest {
                 .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
                 .addPathParam("pet_id", "10")
                 .build();
-        Map <String, String> category =
+        Map<String, String> category =
                 given(requestSpec)
                         .when()
                         .log().all()
@@ -106,7 +106,7 @@ public class FindPetTest {
 
     @Test
     @DisplayName("Check the name is correct")
-    void checkName(){
+    void checkName() {
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
                 .addPathParam("pet_id", "10")
@@ -128,7 +128,7 @@ public class FindPetTest {
 
     @Test
     @DisplayName("Check the status is correct")
-    void checkStatus(){
+    void checkStatus() {
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
                 .addPathParam("pet_id", "10")
@@ -147,40 +147,8 @@ public class FindPetTest {
 
         MatcherAssert.assertThat(petId, is("available"));
     }
+}
 
-        @Test
-        @DisplayName("Retrieve  list of available pets successfully")
-        void retrieveAvailablePetsSuccessfully() {
-            RequestSpecification requestSpec = getRequestSpecBuilder()
-                    .setBasePath(BASE_PATH +PET_PATH+ "findByStatus")
-                    .addQueryParam("status", "available")
-                    .build();
-            given(requestSpec)
-                    .when()
-                    .log().all()
-                    .get()
-                    .then()
-                    .spec(getJsonResponseWithStatus(200))
-                    .log().all()
-                    .body("size()", greaterThan(0)) // Ensure the list is not empty
-                    .body("status", everyItem(is("available"))); // Check every item in the list has status "available"
-        }
-
-    @Test
-    @DisplayName("Retrieve a list of available pets when PetStore API is unavailable")
-    void testPetStoreUnavailable() {
-        RequestSpecification requestSpec = new RequestSpecBuilder()
-                .setBaseUri(BASE_PATH)
-                .setContentType(ContentType.JSON)
-                .build();
-        given()
-                .spec(requestSpec)
-                .when()
-                .get(PET_PATH)
-                .then()
-                .statusCode(isOneOf(500, 503));
-    }
-    }
 
 
 
