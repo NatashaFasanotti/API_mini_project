@@ -15,8 +15,9 @@ import java.util.Map;
 import static org.hamcrest.Matchers.*;
 
 public class InventoryCheck {
-    public static final String BASE_URI = "http://localhost:8080";
-    public static final String BASE_PATH = "/api/v3";
+    public static final String BASE_URI = ApiConfig.getBaseUri();
+    public static final String BASE_PATH = ApiConfig.getBasePath();
+
 
     private static RequestSpecBuilder getRequestSpecBuilder() {
         return new RequestSpecBuilder()
