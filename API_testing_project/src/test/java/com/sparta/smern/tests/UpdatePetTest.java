@@ -59,7 +59,7 @@ public class UpdatePetTest {
                     .spec(getJsonResponseWithStatus(200));
 
         // send a new api request to retrieve the pet again as a POJO
-        PetObject newPet = setUpRequest("/{pet_id}",
+        PetObject petIdentifier = setUpRequest("/{pet_id}",
                 Map.of(
                         "pet_id", PET_ID
                 ))
