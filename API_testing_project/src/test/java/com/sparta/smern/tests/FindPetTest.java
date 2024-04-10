@@ -7,7 +7,9 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
+
+
+
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.MatcherAssert;
@@ -18,7 +20,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.hamcrest.Matchers.is;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
 
 public class FindPetTest {
 
@@ -68,11 +71,11 @@ public class FindPetTest {
         return new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
                 .addHeaders(Map.of(
-                "Accept", "application/json"
+                        "Accept", "application/json"
                 ));
     }
 
-    private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode){
+    private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode) {
         return new ResponseSpecBuilder()
                 .expectStatusCode(statusCode)
                 .expectContentType(ContentType.JSON)
@@ -115,12 +118,15 @@ public class FindPetTest {
                 .extract()
                 .as(PetObject.class);
 
+
         MatcherAssert.assertThat(petIdentifier.getId(), is(999));
+
     }
 
     @Test
     @DisplayName("Check the category ID is correct")
     void checkCategory_Id() {
+
         Category categoryIdentifier = setUpRequest("/{pet_id}",
                 Map.of(
                         "pet_id", PET_ID
@@ -129,11 +135,13 @@ public class FindPetTest {
                 .as(PetObject.class)
                 .getCategory();
            MatcherAssert.assertThat(categoryIdentifier.getId(), is(998));
+
     }
 
     @Test
     @DisplayName("Check the category name is correct")
     void checkCategory_Name() {
+
         Category categoryIdentifier = setUpRequest("/{pet_id}",
                 Map.of(
                         "pet_id", PET_ID
@@ -142,10 +150,12 @@ public class FindPetTest {
                 .as(PetObject.class)
                 .getCategory();
         MatcherAssert.assertThat(categoryIdentifier.getName(), is("Dogs"));
+
     }
 
     @Test
     @DisplayName("Check the name is correct")
+
     void checkName(){
         PetObject petIdentifier = setUpRequest("/{pet_id}",
                 Map.of(
@@ -155,10 +165,12 @@ public class FindPetTest {
                 .as(PetObject.class);
 
         MatcherAssert.assertThat(petIdentifier.getName(), is("under_the_bed"));
+
     }
 
     @Test
     @DisplayName("Check the status is correct")
+
     void checkStatus(){
         PetObject petIdentifier = setUpRequest("/{pet_id}",
                 Map.of(
@@ -188,6 +200,12 @@ public class FindPetTest {
                 .then()
                 .spec(getJsonResponseWithStatus(200));
 
-    }
 
+    }
 }
+
+
+
+
+
+
