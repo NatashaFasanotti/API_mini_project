@@ -1,5 +1,7 @@
-package com.sparta.smern;
+package com.sparta.smern.tests;
 
+import com.sparta.smern.ApiConfig;
+import com.sparta.smern.pojos.PetObject;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -25,6 +27,21 @@ public class FindPetTest {
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
     public static final String TOKEN = ApiConfig.getToken();
 
+    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
+        RequestSpecification requestSpec = getRequestSpecBuilder()
+                .setBasePath(BASE_PATH + PET_PATH + path)
+                .addPathParam("pet_id", "10")
+                .build();
+        return RestAssured
+                .given(requestSpec)
+                .when()
+                .log().all()
+                .get()
+                .then()
+                .spec(getJsonResponseWithStatus(200))
+                .log().all();
+    }
+
     private static RequestSpecBuilder getRequestSpecBuilder() {
         return new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
@@ -42,24 +59,16 @@ public class FindPetTest {
 
     @Test
     @DisplayName("Check the id is correct")
-    void checkId() {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
-                .addPathParam("pet_id", "10")
-                .build();
-        Integer petId =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .get("id");
+    void checkId(){
+        PetObject petIdentifier = setUpRequest("/{pet_id}",
+                Map.of(
+                        "pet_id", "10"
+                ))
+                .extract()
+                .as(PetObject.class);
 
-        MatcherAssert.assertThat(petId, is(10));
+
+        MatcherAssert.assertThat(petIdentifier.getId(), is(10));
     }
 
     @Test

@@ -29,21 +29,6 @@
 
 #### Project Set Up in Docker: 
 
-#### Fork the Repository:
-
-- Go to Swagger Petstore Repository:
-  ##### https://github.com/swagger-api/swagger-petstore.
-  
-- Click on "Fork" to create a copy of the repository in your GitHub account.
-
-##### Clone the Repository to Your Computer:
-
-- Create a new folder on your computer. 
-- Open a terminal or command prompt in this folder.
-- Use the git clone command to clone your forked repository:
-  
-  ##### git clone https://github.com/your-username/swagger-petstore.git
-
 ##### Register on Docker Hub:
 
 - Visit Docker Hub and sign up for an account.
@@ -58,11 +43,11 @@
   
 - Run the Docker container:
 
-  ##### docker run --name swagger-petstore -d -p 8080:8080 swaggerapi/petstore3:unstable
+  ##### docker run --name petrehomingservice -d -p 8080:8080 swaggerapi/petstore3:unstable
 
 - Verify Installation:
 
-  ##### Open a web browser and navigate to http://localhost:8080/ to access the Swagger Petstore running locally on your machine.
+##### Open a web browser and navigate to http://localhost:8080/ to access the Swagger Petstore running locally on your machine.
   
 #### By following these steps, you'll have a local instance of the Swagger Petstore set up and running using Docker. This allows you to experiment with the petstore application without affecting the original repository.
 
