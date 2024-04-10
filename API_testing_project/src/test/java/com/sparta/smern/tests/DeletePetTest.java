@@ -45,28 +45,28 @@ public class DeletePetTest {
             }
            """;
 
-//    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
-//        RequestSpecification requestSpec = getRequestSpecBuilder()
-//                .setBasePath(BASE_PATH + PET_PATH + path)
-//                .addPathParam("pet_id", PET_ID)
-//                .build();
-//        return RestAssured
-//                .given(requestSpec)
-//                .when()
-//                .log().all()
-//                .get()
-//                .then()
-//                .spec(getJsonResponseWithStatus(200))
-//                .log().all();
-//    }
-//
-//    private static RequestSpecBuilder getRequestSpecBuilder() {
-//        return new RequestSpecBuilder()
-//                .setBaseUri(BASE_URI)
-//                .addHeaders(Map.of(
-//                        "Accept", "application/json"
-//                ));
-//    }
+    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
+        RequestSpecification requestSpec = getRequestSpecBuilder()
+                .setBasePath(BASE_PATH + PET_PATH + path)
+                .addPathParam("pet_id", PET_ID)
+                .build();
+        return RestAssured
+                .given(requestSpec)
+                .when()
+                .log().all()
+                .get()
+                .then()
+                .spec(getJsonResponseWithStatus(200))
+                .log().all();
+    }
+
+    private static RequestSpecBuilder getRequestSpecBuilder() {
+        return new RequestSpecBuilder()
+                .setBaseUri(BASE_URI)
+                .addHeaders(Map.of(
+                        "Accept", "application/json"
+                ));
+    }
 
     private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode){
         return new ResponseSpecBuilder()
@@ -118,12 +118,7 @@ public class DeletePetTest {
                 .when()
                 .delete();
 
-        // Assert that the response status code is 200
-        result.then().statusCode(200);
-
-        // Extract the status code from the response and explicitly assert its value
-        int statusCode = result.getStatusCode();
-        MatcherAssert.assertThat("Status code is not 200", statusCode, is(200));
+        MatcherAssert.assertThat(result.getStatusCode(), is(200));
     }
 
 }
