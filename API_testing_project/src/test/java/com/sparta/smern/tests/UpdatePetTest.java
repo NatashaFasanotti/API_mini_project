@@ -58,6 +58,13 @@ public class UpdatePetTest {
                 .extract()
                     .as(PetObject.class);
 
+        PetObject newPet = setUpRequest("/{pet_id}",
+                Map.of(
+                        "pet_id", PET_ID
+                ))
+                .extract()
+                .as(PetObject.class);
+
         MatcherAssert.assertThat(petIdentifier.getId(), is(PET_ID));
     }
 
@@ -69,7 +76,7 @@ public class UpdatePetTest {
                 ));
     }
 
-    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
+    private static ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + PET_PATH + path)
                 .addPathParam("pet_id", PET_ID)
