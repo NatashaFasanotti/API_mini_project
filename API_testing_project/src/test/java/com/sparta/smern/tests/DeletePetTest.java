@@ -7,6 +7,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -77,7 +78,7 @@ public class DeletePetTest {
 
     @BeforeAll
     @DisplayName("Create a pet with a JSON body")
-    static void createPetWithJsonBody() {
+    public static void createPetWithJsonBody() {
         // Define the JSON body as a String or use a Map or POJO that will be serialized to JSON
         RequestSpecification requestSpec = new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
@@ -98,12 +99,12 @@ public class DeletePetTest {
                 .extract()
                 .as(PetObject.class);
 
-        MatcherAssert.assertThat(petIdentifier.getId(), is(10));
+        MatcherAssert.assertThat(petIdentifier.getId(), is(888));
     }
 
     @Test
     @DisplayName("Delete the newly created object")
-    static void deletePet(){
+    public void deletePet(){
         RequestSpecification requestSpec = new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
                 .addHeaders(Map.of(
@@ -112,14 +113,17 @@ public class DeletePetTest {
                 .setBasePath(BASE_PATH + PET_PATH + "/" + PET_ID)
                 .build();
 
-        RestAssured
+        Response result = RestAssured
                 .given(requestSpec)
                 .when()
-                .delete()
-                .then()
-                .spec(getJsonResponseWithStatus(200));
+                .delete();
 
-        MatcherAssert.assertThat(status code is 200);
+        // Assert that the response status code is 200
+        result.then().statusCode(200);
+
+        // Extract the status code from the response and explicitly assert its value
+        int statusCode = result.getStatusCode();
+        MatcherAssert.assertThat("Status code is not 200", statusCode, is(200));
     }
 
 }
