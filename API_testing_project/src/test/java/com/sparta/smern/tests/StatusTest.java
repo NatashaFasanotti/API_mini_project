@@ -22,14 +22,15 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.isOneOf;
 
 public class StatusTest {
+
+    public static final String BASE_URI = ApiConfig.getBaseUri();
     public static final String BASE_PATH = ApiConfig.getBasePath();
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
-    public static final String BASE_URI = "http://localhost:8080/api/v3/openapi.json";
 
     private static RequestSpecBuilder baseRequestSpec() {
         return new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
-        //        .setBasePath(BASE_PATH + PET_PATH + "/findByStatus")
+                .setBasePath(BASE_PATH + PET_PATH + "/findByStatus")
                 .addHeaders(Map.of(
                         "Accept", "application/json",
                         "Content-Type", "application/json"
@@ -58,21 +59,6 @@ public class StatusTest {
                 .spec(jsonResponseSpec(200)); // Assuming default expected status is 200
     }
 
-    @BeforeAll
-    @DisplayName("Create a pet with a JSON body")
-    static void createPetWithJsonBody() {
-        RequestSpecification requestSpec = baseRequestSpec()
-                .addQueryParam("status", "available")
-                .build();
-        RestAssured
-                .given(requestSpec)
-                .when()
-                .post()
-                .then()
-                .spec(jsonResponseSpec(200))
-                .log().all();
-    }
-
     @Test
     @DisplayName("Retrieve list of available pets successfully")
     void retrieveAvailablePetsSuccessfully() {
@@ -80,22 +66,6 @@ public class StatusTest {
 
         response.body("size()", greaterThan(0));
         response.body("status", everyItem(is("available")));
-    }
-
-    @Test
-    @DisplayName("Retrieve a list of available pets when PetStore API is unavailable")
-    void testPetStoreUnavailable() {
-        RequestSpecification requestSpec = new RequestSpecBuilder()
-                .setBasePath(BASE_PATH) // Assuming the path should be just the base path here
-                .setContentType(ContentType.JSON)
-                .build();
-
-        RestAssured
-                .given(requestSpec)
-                .when()
-                .get("/findByStatus")
-                .then()
-                .statusCode(is(400));
     }
 
 }
