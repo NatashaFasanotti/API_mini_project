@@ -32,8 +32,8 @@ public class FindPetTest {
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
     private static final String PET_ID = "999";
 
-    public static Pet pet = new Pet(888, new Pet.Category(889, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
-            List.of(new Pet.Tag(887, "stringOfTag")), "available");
+    public static Pet pet = new Pet(999, new Pet.Category(998, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
+            List.of(new Pet.Tag(998, "stringOfTag")), "available");
 
 
     private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
