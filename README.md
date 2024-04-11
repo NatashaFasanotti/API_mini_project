@@ -1,5 +1,5 @@
 # API MINI Project - [Swagger API - Pet Store 3](https://github.com/swagger-api/swagger-petstore)
-###### Java, Junit, Postman, Docker
+###### Java, Junit, Postman, Docker, RestAssured, POJO, Java Record, Hamcrest
 
 ### Project Goal:
 - to test 3 endpoints
@@ -27,23 +27,20 @@
 - Docker Desktop will install Docker Engine, Docker CLI, Docker Compose, and Docker Machine.
 - Resources: Official Docker Documentation: https://docs.docker.com/
 
-#### Project Set Up in Docker: 
+#### Project Set Up in Docker:
 
-##### Register on Docker Hub:
+Download [Docker](https://www.docker.com/products/docker-desktop/)
 
-- Visit Docker Hub and sign up for an account.
-- Log in to Docker from Terminal:
-
-  ##### docker login
+- Pull *swaggerapi/petstore3:unstable* Image:
   
-- Enter your Docker Hub username and password (password characters will not be visible as you type).
-- Pull and Run Docker Image:
-
-  ##### docker pull swaggerapi/petstore3:unstable
-  
+```
+docker pull swaggerapi/petstore3:unstable
+```
 - Run the Docker container:
 
-  ##### docker run --name petrehomingservice -d -p 8080:8080 swaggerapi/petstore3:unstable
+```
+docker run --name petrehomingservice -d -p 8080:8080 swaggerapi/petstore3:unstable
+```
 
 - Verify Installation:
 
@@ -82,14 +79,11 @@
 
 ## Project Structure
 
-#### The ApiConfig class provides base URIs, paths, and tokens required for API testing.
-
-#### Main functionalities: 
+#### The ApiConfig class provides links into a local config.properties file where secret information is stored (typically api-keys):
 
 - getBaseUri(): Retrieve the base URI of the API.
 - getBasePath(): Retrieve the base path for API endpoints.
 - getCommonBasePath(): Retrieve the common base path for pet-related endpoints.
-- getToken(): Retrieve the authentication token required for accessing the API.
 
 #### The FindPetTest class demonstrates how to interact with a pet-related API to perform tests on pet endpoints.
 
@@ -101,7 +95,7 @@
 - checkName(): Verify that the name of a pet matches a predefined value.
 - checkStatus(): Validate that the status of a pet is in an expected state.
 
-### Dependencies: 
+### Java Dependencies: 
 
 ##### io.restassured:rest-assured:5.3.1
 ##### org.hamcrest:hamcrest-core:2.2

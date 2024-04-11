@@ -37,5 +37,8 @@ public class ApiConfig {
         return properties.getProperty("common_base_path");
     }
 
+    public static String getUserPath() {
+        return properties.getProperty("user_path");
+    }
 
 }
