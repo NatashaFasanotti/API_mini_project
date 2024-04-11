@@ -3,6 +3,7 @@ package com.sparta.smern.tests;
 import com.sparta.smern.ApiConfig;
 import com.sparta.smern.pojos.Category;
 import com.sparta.smern.pojos.PetObject;
+import com.sparta.smern.records.Pet;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -28,29 +30,11 @@ public class FindPetTest {
     public static final String BASE_URI = ApiConfig.getBaseUri();
     public static final String BASE_PATH = ApiConfig.getBasePath();
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
-    public static final String TOKEN = ApiConfig.getToken();
-
     private static final String PET_ID = "999";
-    private static String jsonBody = """
-            {
-                "id": 999,
-                "category": {
-                    "id": 998,
-                    "name": "Dogs"
-                },
-                "name": "under_the_bed",
-                "photoUrls": [
-                    "stringOfPhotoUrl"
-                ],
-                "tags": [
-                    {
-                        "id": 997,
-                        "name": "stringOfTag"
-                    }
-                ],
-                "status": "available"
-            }
-           """;
+
+    public static Pet pet = new Pet(999, new Pet.Category(998, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
+            List.of(new Pet.Tag(998, "stringOfTag")), "available");
+
 
     private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
         RequestSpecification requestSpec = getRequestSpecBuilder()
@@ -82,7 +66,6 @@ public class FindPetTest {
                 .build();
     }
 
-
     @BeforeAll
     @DisplayName("Create a pet with a JSON body")
     static void createPetWithJsonBody() {
@@ -95,14 +78,16 @@ public class FindPetTest {
                 ))
                 .setBasePath(BASE_PATH + PET_PATH)
                 .build();
+                requestSpec.body(pet);
 
         RestAssured
                 .given(requestSpec)
-                    .body(jsonBody)
+                    //.body(jsonBody)
                 .when()
                     .post()
                 .then()
                     .spec(getJsonResponseWithStatus(200));
+
     }
 
     @Test
@@ -114,7 +99,6 @@ public class FindPetTest {
                 ))
                 .extract()
                 .as(PetObject.class);
-
 
         MatcherAssert.assertThat(petIdentifier.getId(), is(999));
 
