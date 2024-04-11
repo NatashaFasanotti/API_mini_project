@@ -146,11 +146,6 @@ public class CreateAccountTest {
                 .spec(getJsonResponseWithStatus(200));
     }
 
-
-    //.then();
-//        MatcherAssert.assertThat(result.statusCode(), is(404));
-
-
     @AfterAll
     @DisplayName("Delete Test Account after all")
     public static void afterAll() {
