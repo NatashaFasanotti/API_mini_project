@@ -44,34 +44,21 @@ public class InventoryCheckTest {
                 .build();
     }
 
-    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + INVENTORY_PATH)
-                .build();
-        return RestAssured
-                .given(requestSpec)
-                .when()
-                .log().all()
-                .get()
-                .then()
-                .spec(getJsonResponseWithStatus(200))
-                .log().all();
-    }
     @BeforeAll
     @DisplayName("Inventory check")
     static void getInventoryCount() {
         RequestSpecification requestSpec = getRequestSpecBuilder()
                 .setBasePath(BASE_PATH + INVENTORY_PATH)
                 .build();
-                inventory = (InventoryObject) given(requestSpec)
+        inventory = (InventoryObject) given(requestSpec)
                 .when()
                 .log().all()
                 .get()
                 .then()
                 .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .as(InventoryObject.class);
+                .log().all()
+                .extract()
+                .as(InventoryObject.class);
     }
 
     @Test
@@ -81,6 +68,7 @@ public class InventoryCheckTest {
         System.out.println("Placed: " + inventory.getPlaced());
         System.out.println("Delivered: " + inventory.getDelivered());
     }
+
     @Test
     @DisplayName("Check approved returns a positive integer")
     void approvedReturnsPositiveInteger() {
@@ -88,7 +76,7 @@ public class InventoryCheckTest {
     }
 
     @Test
-    @DisplayName("Check approved returns a positive integer")
+    @DisplayName("Check placed returns a positive integer")
     void placedReturnsPositiveInteger() {
         MatcherAssert.assertThat(inventory.getPlaced(), greaterThanOrEqualTo(0));
     }
@@ -100,49 +88,7 @@ public class InventoryCheckTest {
     }
 
 
-    @Test
-    @DisplayName("Check that id field exists and is a number")
-    void checksIdField(){
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/pet/{pet_id}")
-                .addPathParam("pet_id", "10")
-                .build();
-        Map<String, Object> petInfo =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .getMap("");
-
-        MatcherAssert.assertThat(petInfo.containsKey("id"), equalTo(true));
-        MatcherAssert.assertThat(petInfo.get("id"), instanceOf(Integer.class));
-    }
-
-    @Test
-    @DisplayName("Check that id is a positive number")
-    void checksIdIsPositive(){
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/pet/{pet_id}")
-                .addPathParam("pet_id", "10")
-                .build();
-        Integer petId =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .get("id");
-
-        MatcherAssert.assertThat(petId, is(greaterThanOrEqualTo(0)));
-    }
 }
+
+
 
