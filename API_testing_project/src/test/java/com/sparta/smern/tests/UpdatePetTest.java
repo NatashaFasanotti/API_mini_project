@@ -102,7 +102,7 @@ public class UpdatePetTest {
     @Test
     @DisplayName("Correct ID Test")
     void correctIdTest(){
-        MatcherAssert.assertThat(testPet.getId(), is(pet.id())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testPet.getId(), is(pet.id()));
     }
 
     @Test
