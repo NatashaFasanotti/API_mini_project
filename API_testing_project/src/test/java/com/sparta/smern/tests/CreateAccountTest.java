@@ -90,43 +90,43 @@ public class CreateAccountTest {
     @Test
     @DisplayName("Correct ID Test")
     void correctIdTest(){
-        MatcherAssert.assertThat(testAccount.getId(), is(account.id())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getId(), is(account.id()));
     }
 
     @Test
     @DisplayName("Correct firstName")
     void correctFirstNameTest(){
-        MatcherAssert.assertThat(testAccount.getFirstName(), is(account.firstName())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getFirstName(), is(account.firstName()));
     }
 
     @Test
     @DisplayName("Correct last name")
     void correctLastNameTest(){
-        MatcherAssert.assertThat(testAccount.getLastName(), is(account.lastName())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getLastName(), is(account.lastName()));
     }
 
     @Test
     @DisplayName("Correct email")
     void correctEmailTest(){
-        MatcherAssert.assertThat(testAccount.getEmail(), is(account.email())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getEmail(), is(account.email()));
     }
 
     @Test
     @DisplayName("Correct password")
     void correctPasswordTest(){
-        MatcherAssert.assertThat(testAccount.getPassword(), is(account.password())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getPassword(), is(account.password()));
     }
 
     @Test
     @DisplayName("Correct phone")
     void correctPhoneTest(){
-        MatcherAssert.assertThat(testAccount.getPhone(), is(account.phone())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getPhone(), is(account.phone()));
     }
 
     @Test
     @DisplayName("Correct user status")
     void correctUserStatusTest(){
-        MatcherAssert.assertThat(testAccount.getUserStatus(), is(account.userStatus())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getUserStatus(), is(account.userStatus()));
     }
 
     @AfterAll
