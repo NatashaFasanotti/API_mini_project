@@ -1,6 +1,8 @@
-package com.sparta.smern;
+package com.sparta.smern.tests;
 
+import com.sparta.smern.ApiConfig;
 import com.sparta.smern.pojos.InventoryObject;
+import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
@@ -20,10 +22,11 @@ import static org.hamcrest.Matchers.*;
 public class InventoryCheckTest {
     public static final String BASE_URI = ApiConfig.getBaseUri();
     public static final String BASE_PATH = ApiConfig.getBasePath();
-
     public static final String PET_PATH = ApiConfig.getCommonBasePath();
+
+    public static final String INVENTORY_PATH = "/store/inventory";
     private static InventoryObject inventory;
-    private static Map<String, Integer> inventoryData;
+//    private static Map<String, Integer> inventoryData;
 
     private static RequestSpecBuilder getRequestSpecBuilder() {
         return new RequestSpecBuilder()
@@ -41,14 +44,12 @@ public class InventoryCheckTest {
                 .build();
     }
 
-    @BeforeAll
-    @DisplayName("Inventory check")
-    static void getInventoryCount() {
+    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
         RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/store/inventory")
+                .setBasePath(BASE_PATH + INVENTORY_PATH)
                 .build();
-                requestSpec.body(inventoryData);
-                inventory = (InventoryObject) given(requestSpec)
+        return RestAssured
+                .given(requestSpec)
                 .when()
                 .log().all()
                 .get()
@@ -56,96 +57,48 @@ public class InventoryCheckTest {
                 .spec(getJsonResponseWithStatus(200))
                 .log().all();
     }
+    @BeforeAll
+    @DisplayName("Inventory check")
+    static void getInventoryCount() {
+        RequestSpecification requestSpec = getRequestSpecBuilder()
+                .setBasePath(BASE_PATH + INVENTORY_PATH)
+                .build();
+                inventory = (InventoryObject) given(requestSpec)
+                .when()
+                .log().all()
+                .get()
+                .then()
+                .spec(getJsonResponseWithStatus(200))
+                        .log().all()
+                        .extract()
+                        .as(InventoryObject.class);
+    }
 
     @Test
     @DisplayName("Check inventory count")
-    void inventoryCountTest() {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/store/inventory")
-                .build();
-
-        Map<String, Integer> inventoryData =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .getMap("");
-
-        System.out.println("Approved: " + inventoryData.get("approved"));
-        System.out.println("Placed: " + inventoryData.get("placed"));
-        System.out.println("Delivered: " + inventoryData.get("delivered"));
+    void inventoryCount() {
+        System.out.println("Approved: " + inventory.getApproved());
+        System.out.println("Placed: " + inventory.getPlaced());
+        System.out.println("Delivered: " + inventory.getDelivered());
+    }
+    @Test
+    @DisplayName("Check approved returns a positive integer")
+    void approvedReturnsPositiveInteger() {
+        MatcherAssert.assertThat(inventory.getApproved(), greaterThanOrEqualTo(0));
     }
 
     @Test
     @DisplayName("Check approved returns a positive integer")
-    void approvedReturnsPositiveInteger() {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/store/inventory")
-                .build();
-
-        Map<String, Integer> inventoryData =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .getMap("");
-
-        MatcherAssert.assertThat(inventoryData.get("approved"), greaterThanOrEqualTo(0));
-    }
-
-    @Test
-    @DisplayName("Check placed returns a positive integer")
     void placedReturnsPositiveInteger() {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/store/inventory")
-                .build();
-
-        Map<String, Integer> inventoryData =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .getMap("");
-
-        MatcherAssert.assertThat(inventoryData.get("placed"), greaterThanOrEqualTo(0));
+        MatcherAssert.assertThat(inventory.getPlaced(), greaterThanOrEqualTo(0));
     }
 
     @Test
     @DisplayName("Check delivered returns a positive integer")
     void deliveredReturnsPositiveInteger() {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + "/store/inventory")
-                .build();
-
-        Map<String, Integer> inventoryData =
-                given(requestSpec)
-                        .when()
-                        .log().all()
-                        .get()
-                        .then()
-                        .spec(getJsonResponseWithStatus(200))
-                        .log().all()
-                        .extract()
-                        .jsonPath()
-                        .getMap("");
-
-        MatcherAssert.assertThat(inventoryData.get("delivered"), greaterThanOrEqualTo(0));
+        MatcherAssert.assertThat(inventory.getDelivered(), greaterThanOrEqualTo(0));
     }
+
 
     @Test
     @DisplayName("Check that id field exists and is a number")
