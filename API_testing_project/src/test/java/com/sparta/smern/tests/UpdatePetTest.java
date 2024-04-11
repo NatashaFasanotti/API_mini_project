@@ -117,6 +117,21 @@ public class UpdatePetTest {
         MatcherAssert.assertThat(testPet.getStatus(), is("sold"));
     }
 
+    @Test
+    @DisplayName("updating a pet that doesn't exist")
+    void accountThatDoesNotExist(){
+        RequestSpecification patchRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH + "/" +"10000000000")
+                .build();
 
+        patchRequest.body(pet);
+        result = RestAssured
+                .given(patchRequest)
+                .when()
+                .put()
+                .then()
+                .spec(getJsonResponseWithStatus(405));
+
+    }
 
 }
