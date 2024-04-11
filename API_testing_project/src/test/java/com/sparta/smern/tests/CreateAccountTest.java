@@ -7,6 +7,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -45,7 +46,7 @@ public class CreateAccountTest {
                 .build();
     }
 
-    private static void sendRequest(RequestSpecification request){
+    private static void sendRequest(RequestSpecification request) {
         result = RestAssured
                 .given(request)
                 .when()
@@ -54,7 +55,7 @@ public class CreateAccountTest {
                 .spec(getJsonResponseWithStatus(200));
     }
 
-    public static void createPojo(RequestSpecification request){
+    public static void createPojo(RequestSpecification request) {
         testAccount = RestAssured
                 .given(request)
                 .when()
@@ -89,45 +90,66 @@ public class CreateAccountTest {
 
     @Test
     @DisplayName("Correct ID Test")
-    void correctIdTest(){
+    void correctIdTest() {
         MatcherAssert.assertThat(testAccount.getId(), is(account.id())); // may need to recast the result as an int
     }
 
     @Test
     @DisplayName("Correct firstName")
-    void correctFirstNameTest(){
+    void correctFirstNameTest() {
         MatcherAssert.assertThat(testAccount.getFirstName(), is(account.firstName())); // may need to recast the result as an int
     }
 
     @Test
     @DisplayName("Correct last name")
-    void correctLastNameTest(){
+    void correctLastNameTest() {
         MatcherAssert.assertThat(testAccount.getLastName(), is(account.lastName())); // may need to recast the result as an int
     }
 
     @Test
     @DisplayName("Correct email")
-    void correctEmailTest(){
+    void correctEmailTest() {
         MatcherAssert.assertThat(testAccount.getEmail(), is(account.email())); // may need to recast the result as an int
     }
 
     @Test
     @DisplayName("Correct password")
-    void correctPasswordTest(){
+    void correctPasswordTest() {
         MatcherAssert.assertThat(testAccount.getPassword(), is(account.password())); // may need to recast the result as an int
     }
 
     @Test
     @DisplayName("Correct phone")
-    void correctPhoneTest(){
+    void correctPhoneTest() {
         MatcherAssert.assertThat(testAccount.getPhone(), is(account.phone())); // may need to recast the result as an int
     }
 
     @Test
     @DisplayName("Correct user status")
-    void correctUserStatusTest(){
+    void correctUserStatusTest() {
         MatcherAssert.assertThat(testAccount.getUserStatus(), is(account.userStatus())); // may need to recast the result as an int
     }
+
+    @Test
+    @DisplayName("Add account with empty fields")
+    void emptyFieldsAccountTest() {
+        Account invalidAccount = new Account(7, "", "", "", "", "", "", 2);
+        RequestSpecification postRequest = requestSpecBuilder()
+                .setBasePath(USER_PATH)
+                .build();
+        postRequest.body(invalidAccount);
+        result = RestAssured
+                .given(postRequest)
+                .when()
+                .post()
+                .then()
+                .spec(getJsonResponseWithStatus(200));
+    }
+
+
+    //.then();
+//        MatcherAssert.assertThat(result.statusCode(), is(404));
+
 
     @AfterAll
     @DisplayName("Delete Test Account after all")
