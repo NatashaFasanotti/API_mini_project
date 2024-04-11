@@ -113,7 +113,7 @@ public class AddPetTest {
     }
 
     @Test
-    @DisplayName("New Pet appears in the list of 'available' dogs")
+    @DisplayName("New Pet appears in the list of 'available' pets")
     public void appearsInListTest() {
         // API Request - GET request to retrieve List of Available Pets
         RequestSpecification getPetsRequest = requestSpecBuilder()
@@ -124,10 +124,8 @@ public class AddPetTest {
         List<PetObject> resultAvailablePets = RestAssured
                 .given(getPetsRequest)
                 .when()
-                .log().all()
                 .get()
                 .then()
-                .log().all()
                 .spec(getJsonResponseWithStatus(200))
                 .extract()
                 .jsonPath()
@@ -136,9 +134,38 @@ public class AddPetTest {
         List<String> availablePets = new ArrayList<>();
         for (PetObject animal: resultAvailablePets) {
             availablePets.add(animal.getName());
+            System.out.println(animal.getName());
         }
 
-        MatcherAssert.assertThat(testNewPet.getName(), not(availablePets.contains(testNewPet.getName())));
+        MatcherAssert.assertThat(testNewPet.getName(), availablePets.contains(testNewPet.getName()));
+    }
+
+    @Test
+    @DisplayName("New Pet does not appear in the list of 'sold' pets")
+    public void doesNotAppearInListTest() {
+        // API Request - GET request to retrieve List of Available Pets
+        RequestSpecification getPetsRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH + "/findByStatus")
+                .addQueryParam("status", "sold")
+                .build();
+
+        List<PetObject> resultSoldPets = RestAssured
+                .given(getPetsRequest)
+                .when()
+                .get()
+                .then()
+                .spec(getJsonResponseWithStatus(200))
+                .extract()
+                .jsonPath()
+                .getList(".", PetObject.class);
+
+        List<String> soldPets = new ArrayList<>();
+        for (PetObject animal: resultSoldPets) {
+            soldPets.add(animal.getName());
+            System.out.println(animal.getName());
+        }
+
+        MatcherAssert.assertThat(testNewPet.getName(), not(soldPets.contains(testNewPet.getName())));
     }
 
 }
