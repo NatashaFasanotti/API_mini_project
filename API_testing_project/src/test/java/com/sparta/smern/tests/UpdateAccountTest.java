@@ -28,6 +28,7 @@ public class UpdateAccountTest {
     public static final String USER_PATH = ApiConfig.getUserPath();
     public static Account account = new Account(99, "testUser", "Miss", "Tester", "example@example.com", "testPassword", "0123456789", 1);
     public static Account updatedAccount = new Account(99, "testUser", "Mrs", "MarriedTester", "example@example.com", "testPassword", "0123456789", 1);
+
     private static ValidatableResponse result;
     private static AccountObject testAccount;
 
@@ -66,6 +67,8 @@ public class UpdateAccountTest {
                 .extract()
                 .as(AccountObject.class);
     }
+
+
 
     @BeforeAll
     @DisplayName("Create, Update & Get test pet")
@@ -120,18 +123,22 @@ public class UpdateAccountTest {
         MatcherAssert.assertThat(testAccount.getLastName(), is(updatedAccount.lastName())); // may need to recast the result as an int
     }
 
-//    @Test
-//    @DisplayName("Invalid ID inputted")
-//    void invalidIdTest(){
-//        MatcherAssert.assertThat(testAccount.getId(), is(not(account.id()))); // may need to recast the result as an int
-//    }
     @Test
-    @DisplayName("Invalid ID inputted")
-    void invalidIdTest(){
-        // Expecting a 404 status code when an invalid ID is provided
-        MatcherAssert.assertThat(result.extract().statusCode(), is(404));
-    }
+    @DisplayName("updating an account that doesn't exist")
+            void accountThatDoesNotExist(){
+        RequestSpecification patchRequest = requestSpecBuilder()
+                .setBasePath(USER_PATH + "/" +"dhdu")
+                .build();
+        // Send in the account record
+        patchRequest.body(updatedAccount);
+        result = RestAssured
+                .given(patchRequest)
+                .when()
+                .put()
+                .then()
+                .spec(getJsonResponseWithStatus(404));
 
+    }
 
     @AfterAll
     @DisplayName("Delete Test Account after all")
