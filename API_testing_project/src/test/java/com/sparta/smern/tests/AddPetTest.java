@@ -16,10 +16,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class AddPetTest {
 
@@ -109,6 +110,35 @@ public class AddPetTest {
     public void statusChangedTest() {
         testNewPetCategory = testNewPet.getCategory();
         MatcherAssert.assertThat(testNewPetCategory.getName(), is("Dogs"));
+    }
+
+    @Test
+    @DisplayName("New Pet appears in the list of 'available' dogs")
+    public void appearsInListTest() {
+        // API Request - GET request to retrieve List of Available Pets
+        RequestSpecification getPetsRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH + "/findByStatus")
+                .addQueryParam("status", "available")
+                .build();
+
+        List<PetObject> resultAvailablePets = RestAssured
+                .given(getPetsRequest)
+                .when()
+                .log().all()
+                .get()
+                .then()
+                .log().all()
+                .spec(getJsonResponseWithStatus(200))
+                .extract()
+                .jsonPath()
+                .getList(".", PetObject.class);
+
+        List<String> availablePets = new ArrayList<>();
+        for (PetObject animal: resultAvailablePets) {
+            availablePets.add(animal.getName());
+        }
+
+        MatcherAssert.assertThat(testNewPet.getName(), not(availablePets.contains(testNewPet.getName())));
     }
 
 }
