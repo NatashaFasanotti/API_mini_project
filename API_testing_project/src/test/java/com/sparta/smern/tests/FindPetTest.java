@@ -10,6 +10,7 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
 
 
+import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.MatcherAssert;
@@ -36,7 +37,7 @@ public class FindPetTest {
     private static Category category;
 
 
-        private static RequestSpecBuilder getRequestSpecBuilder() {
+    private static RequestSpecBuilder getRequestSpecBuilder() {
         return new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
                 .addHeaders(Map.of(
@@ -45,7 +46,7 @@ public class FindPetTest {
                 ));
     }
 
-        private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode) {
+    private static ResponseSpecification getJsonResponseWithStatus(Integer statusCode) {
         return new ResponseSpecBuilder()
                 .expectStatusCode(statusCode)
                 .expectContentType(ContentType.JSON)
@@ -56,9 +57,9 @@ public class FindPetTest {
         RestAssured
                 .given(request)
                 .when()
-                .post()
-                .then()
-                .spec(getJsonResponseWithStatus(200));
+                    .post()
+                    .then()
+                    .spec(getJsonResponseWithStatus(200));
     }
 
     public static void createPetPojo(RequestSpecification request){
@@ -78,12 +79,12 @@ public class FindPetTest {
                     RestAssured
                             .given(request)
                             .when()
-                            .get()
+                                .get()
                             .then()
-                            .spec(getJsonResponseWithStatus(200))
-                            .extract()
-                            .as(PetObject.class)
-                            .getCategory();
+                                .spec(getJsonResponseWithStatus(200))
+                                .extract()
+                                .as(PetObject.class)
+                                .getCategory();
     }
 
     @BeforeAll
@@ -135,6 +136,33 @@ public class FindPetTest {
     void checkStatus(){
         MatcherAssert.assertThat(petObject.getStatus(), is(pet.status()));
     }
+
+    @Test
+    @DisplayName("Find a pet that doesn't exist outputs a response")
+    void findPetThatDoesntExist(){
+            RequestSpecification getinvalidRequest = getRequestSpecBuilder()
+                    .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
+                    .addPathParam("pet_id", 1000)
+                    .build();
+
+            String errorMessage =
+                    RestAssured
+                    .given(getinvalidRequest)
+                        .when()
+                    .get()
+                    .then()
+                    .spec(getJsonResponseWithStatus(404))
+                            .extract()
+                            .asString();
+
+
+
+            MatcherAssert.assertThat(errorMessage, is("Pet not found"));
+
+    }
+
+
+
 
     @AfterAll
     @DisplayName("Delete the newly created object - teardown")
