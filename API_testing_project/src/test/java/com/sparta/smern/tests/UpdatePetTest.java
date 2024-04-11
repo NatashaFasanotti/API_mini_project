@@ -102,7 +102,7 @@ public class UpdatePetTest {
     @Test
     @DisplayName("Correct ID Test")
     void correctIdTest(){
-        MatcherAssert.assertThat(testPet.getId(), is(pet.id())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testPet.getId(), is(pet.id()));
     }
 
     @Test
@@ -115,6 +115,23 @@ public class UpdatePetTest {
     @DisplayName("Status has changed")
     public void statusChangedTest() {
         MatcherAssert.assertThat(testPet.getStatus(), is("sold"));
+    }
+
+    @Test
+    @DisplayName("updating a pet that doesn't exist")
+    void accountThatDoesNotExist(){
+        RequestSpecification patchRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH + "/" +"10000000000")
+                .build();
+
+        patchRequest.body(pet);
+        result = RestAssured
+                .given(patchRequest)
+                .when()
+                .put()
+                .then()
+                .spec(getJsonResponseWithStatus(405));
+
     }
 
 }

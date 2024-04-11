@@ -67,7 +67,7 @@ public class UpdateAccountTest {
     }
 
     @BeforeAll
-    @DisplayName("Create, Update & Get test pet")
+    @DisplayName("Create, Update & Get test account")
     public static void beforeAll() {
         // Build post request to create a test account
         RequestSpecification postRequest = requestSpecBuilder()
@@ -104,19 +104,19 @@ public class UpdateAccountTest {
     @Test
     @DisplayName("Correct ID Test")
     void correctIdTest(){
-        MatcherAssert.assertThat(testAccount.getId(), is(account.id())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getId(), is(account.id()));
     }
 
     @Test
     @DisplayName("Correct firstName")
     void correctFirstNameTest(){
-        MatcherAssert.assertThat(testAccount.getFirstName(), is(updatedAccount.firstName())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getFirstName(), is(updatedAccount.firstName()));
     }
 
     @Test
     @DisplayName("Correct last name")
     void correctLastNameTest(){
-        MatcherAssert.assertThat(testAccount.getLastName(), is(updatedAccount.lastName())); // may need to recast the result as an int
+        MatcherAssert.assertThat(testAccount.getLastName(), is(updatedAccount.lastName()));
     }
 
     @AfterAll
@@ -130,8 +130,7 @@ public class UpdateAccountTest {
                 .given(deleteRequest)
                 .when()
                 .delete()
-                .then()
-                .spec(getJsonResponseWithStatus(200));
+                .then();
 
     }
 

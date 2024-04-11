@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 public class FindPetTest {
@@ -34,28 +33,16 @@ public class FindPetTest {
 
     public static Pet pet = new Pet(999, new Pet.Category(998, "Dogs"), "under_the_bed", List.of("stringOfPhotoUrl"),
             List.of(new Pet.Tag(998, "stringOfTag")), "available");
+    private static PetObject petObject;
+    private static Category category;
 
-
-    private ValidatableResponse setUpRequest(String path, Map<String, Object> pathParameters) {
-        RequestSpecification requestSpec = getRequestSpecBuilder()
-                .setBasePath(BASE_PATH + PET_PATH + path)
-                .addPathParam("pet_id", PET_ID)
-                .build();
-        return RestAssured
-                .given(requestSpec)
-                .when()
-                .log().all()
-                .get()
-                .then()
-                .spec(getJsonResponseWithStatus(200))
-                .log().all();
-    }
 
     private static RequestSpecBuilder getRequestSpecBuilder() {
         return new RequestSpecBuilder()
                 .setBaseUri(BASE_URI)
                 .addHeaders(Map.of(
-                        "Accept", "application/json"
+                        "Accept", "application/json",
+                        "Content-Type", "application/json"
                 ));
     }
 
@@ -66,116 +53,127 @@ public class FindPetTest {
                 .build();
     }
 
-    @BeforeAll
-    @DisplayName("Create a pet with a JSON body")
-    static void createPetWithJsonBody() {
-        // Define the JSON body as a String or use a Map or POJO that will be serialized to JSON
-        RequestSpecification requestSpec = new RequestSpecBuilder()
-                .setBaseUri(BASE_URI)
-                .addHeaders(Map.of(
-                        "Accept", "application/json",
-                        "Content-Type", "application/json"
-                ))
-                .setBasePath(BASE_PATH + PET_PATH)
-                .build();
-                requestSpec.body(pet);
-
+    private static void sendRequest(RequestSpecification request){
         RestAssured
-                .given(requestSpec)
-                    //.body(jsonBody)
+                .given(request)
                 .when()
                     .post()
-                .then()
+                    .then()
                     .spec(getJsonResponseWithStatus(200));
+    }
 
+    public static void createPetPojo(RequestSpecification request){
+        petObject =
+                RestAssured
+                    .given(request)
+                    .when()
+                        .get()
+                    .then()
+                        .spec(getJsonResponseWithStatus(200))
+                        .extract()
+                        .as(PetObject.class);
+    }
+
+    public static void createCategoryPojo (RequestSpecification request){
+            category =
+                    RestAssured
+                            .given(request)
+                            .when()
+                                .get()
+                            .then()
+                                .spec(getJsonResponseWithStatus(200))
+                                .extract()
+                                .as(PetObject.class)
+                                .getCategory();
+    }
+
+    @BeforeAll
+    @DisplayName("Create a pet to Test")
+    public static void beforeAll(){
+        RequestSpecification postRequest = getRequestSpecBuilder()
+                .setBasePath(BASE_PATH + PET_PATH)
+                .build();
+        postRequest.body(pet);
+
+        sendRequest(postRequest);
+
+        RequestSpecification getPetObject = getRequestSpecBuilder()
+                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
+                .addPathParam("pet_id", PET_ID)
+                .build();
+
+        createPetPojo(getPetObject);
+        createCategoryPojo(getPetObject);
     }
 
     @Test
     @DisplayName("Check the id is correct")
     void checkId(){
-        PetObject petIdentifier = setUpRequest("/{pet_id}",
-                Map.of(
-                        "pet_id", PET_ID
-                ))
-                .extract()
-                .as(PetObject.class);
-
-        MatcherAssert.assertThat(petIdentifier.getId(), is(999));
-
+        MatcherAssert.assertThat(petObject.getId(), is(pet.id()));
     }
 
     @Test
     @DisplayName("Check the category ID is correct")
     void checkCategory_Id() {
-
-        Category categoryIdentifier = setUpRequest("/{pet_id}",
-                Map.of(
-                        "pet_id", PET_ID
-                ))
-                .extract()
-                .as(PetObject.class)
-                .getCategory();
-           MatcherAssert.assertThat(categoryIdentifier.getId(), is(998));
-
+        MatcherAssert.assertThat(category.getId(), is(pet.category().id()));
     }
 
     @Test
     @DisplayName("Check the category name is correct")
     void checkCategory_Name() {
-
-        Category categoryIdentifier = setUpRequest("/{pet_id}",
-                Map.of(
-                        "pet_id", PET_ID
-                ))
-                .extract()
-                .as(PetObject.class)
-                .getCategory();
-        MatcherAssert.assertThat(categoryIdentifier.getName(), is("Dogs"));
-
+        MatcherAssert.assertThat(category.getName(), is(pet.category().name()));
     }
 
     @Test
     @DisplayName("Check the name is correct")
-
     void checkName(){
-        PetObject petIdentifier = setUpRequest("/{pet_id}",
-                Map.of(
-                        "pet_id", PET_ID
-                ))
-                .extract()
-                .as(PetObject.class);
-
-        MatcherAssert.assertThat(petIdentifier.getName(), is("under_the_bed"));
-
+        MatcherAssert.assertThat(petObject.getName(), is(pet.name()));
     }
 
     @Test
     @DisplayName("Check the status is correct")
 
     void checkStatus(){
-        PetObject petIdentifier = setUpRequest("/{pet_id}",
-                Map.of(
-                        "pet_id", PET_ID
-                ))
-                .extract()
-                .as(PetObject.class);
-
-        MatcherAssert.assertThat(petIdentifier.getStatus(), is("available"));
+        MatcherAssert.assertThat(petObject.getStatus(), is(pet.status()));
     }
+
+    @Test
+    @DisplayName("Find a pet that doesn't exist outputs a response")
+    void findPetThatDoesntExist(){
+            RequestSpecification getinvalidRequest = getRequestSpecBuilder()
+                    .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
+                    .addPathParam("pet_id", 1000)
+                    .build();
+
+            String errorMessage =
+                    RestAssured
+                    .given(getinvalidRequest)
+                        .when()
+                    .get()
+                    .then()
+                    .spec(getJsonResponseWithStatus(404))
+                            .extract()
+                            .asString();
+
+
+
+            MatcherAssert.assertThat(errorMessage, is("Pet not found"));
+
+    }
+
+
+
 
     @AfterAll
     @DisplayName("Delete the newly created object - teardown")
     static void tearDown(){
-        RequestSpecification requestSpec = new RequestSpecBuilder()
-                .setBaseUri(BASE_URI)
-                .addHeaders(Map.of(
-                        "Accept", "application/json"
-                ))
-                .setBasePath(BASE_PATH + PET_PATH + "/" + PET_ID)
+        RequestSpecification deletePet = getRequestSpecBuilder()
+                .setBasePath(BASE_PATH + PET_PATH + "/{pet_id}")
+                .addPathParam("pet_id", PET_ID)
                 .build();
 
         RestAssured
-                .given(requestSpec)
+                .given(deletePet)
                 .when()
                 .delete()
                 .then()
