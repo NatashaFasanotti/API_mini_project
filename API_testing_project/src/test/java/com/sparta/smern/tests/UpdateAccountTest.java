@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 public class UpdateAccountTest {
 
@@ -118,6 +119,19 @@ public class UpdateAccountTest {
     void correctLastNameTest(){
         MatcherAssert.assertThat(testAccount.getLastName(), is(updatedAccount.lastName())); // may need to recast the result as an int
     }
+
+//    @Test
+//    @DisplayName("Invalid ID inputted")
+//    void invalidIdTest(){
+//        MatcherAssert.assertThat(testAccount.getId(), is(not(account.id()))); // may need to recast the result as an int
+//    }
+    @Test
+    @DisplayName("Invalid ID inputted")
+    void invalidIdTest(){
+        // Expecting a 404 status code when an invalid ID is provided
+        MatcherAssert.assertThat(result.extract().statusCode(), is(404));
+    }
+
 
     @AfterAll
     @DisplayName("Delete Test Account after all")
