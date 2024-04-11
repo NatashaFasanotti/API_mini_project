@@ -25,6 +25,6 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Run the Maven verify phase
-      run: mvn --batch-mode
+    - name: Run tests
+      run: mvn clean test
 
