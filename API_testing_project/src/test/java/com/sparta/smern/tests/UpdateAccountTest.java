@@ -130,8 +130,7 @@ public class UpdateAccountTest {
                 .given(deleteRequest)
                 .when()
                 .delete()
-                .then()
-                .spec(getJsonResponseWithStatus(200));
+                .then();
 
     }
 

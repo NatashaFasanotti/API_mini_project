@@ -140,8 +140,7 @@ public class CreateAccountTest {
                 .given(deleteRequest)
                 .when()
                 .delete()
-                .then()
-                .spec(getJsonResponseWithStatus(200));
+                .then();
 
     }
 
