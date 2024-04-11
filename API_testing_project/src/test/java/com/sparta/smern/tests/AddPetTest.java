@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -30,8 +31,9 @@ public class AddPetTest {
 
     public static Pet newpet = new Pet(987, new Pet.Category(988, "Dogs"), "hiding_in_the_wardrobe", List.of("stringOfPhotoUrl"),
             List.of(new Pet.Tag(989, "stringOfTag")), "available");
+    public static Pet emptypet = new Pet(0, new Pet.Category(0, ""), "", List.of(""),
+            List.of(new Pet.Tag(0, "")), "");
 
-    private static ValidatableResponse result;
     private static PetObject testNewPet;
     private static Category testNewPetCategory;
 
@@ -52,7 +54,7 @@ public class AddPetTest {
     }
 
     private static void sendRequest(RequestSpecification request){
-        result = RestAssured
+        ValidatableResponse result = RestAssured
                 .given(request)
                 .when()
                 .post()
@@ -134,7 +136,7 @@ public class AddPetTest {
         List<String> availablePets = new ArrayList<>();
         for (PetObject animal: resultAvailablePets) {
             availablePets.add(animal.getName());
-            System.out.println(animal.getName());
+            // System.out.println(animal.getName());
         }
 
         MatcherAssert.assertThat(testNewPet.getName(), availablePets.contains(testNewPet.getName()));
@@ -162,10 +164,26 @@ public class AddPetTest {
         List<String> soldPets = new ArrayList<>();
         for (PetObject animal: resultSoldPets) {
             soldPets.add(animal.getName());
-            System.out.println(animal.getName());
+            // System.out.println(animal.getName());
         }
 
         MatcherAssert.assertThat(testNewPet.getName(), not(soldPets.contains(testNewPet.getName())));
+    }
+
+    @Test
+    @DisplayName("Sad Path - Add an empty pet")
+    public void addEmptyPet() {
+        RequestSpecification postRequest = requestSpecBuilder()
+                .setBasePath(PET_PATH)
+                .build();
+        postRequest.body(emptypet);
+
+        Response response = RestAssured
+                .given(postRequest)
+                .when()
+                .post();
+
+        MatcherAssert.assertThat(response.statusCode(), is(200)); // it adds an empty pet!
     }
 
 }
