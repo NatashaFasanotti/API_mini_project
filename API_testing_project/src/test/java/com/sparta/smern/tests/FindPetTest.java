@@ -162,8 +162,6 @@ public class FindPetTest {
     }
 
 
-
-
     @AfterAll
     @DisplayName("Delete the newly created object - teardown")
     static void tearDown(){
