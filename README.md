@@ -4,6 +4,7 @@
 ### Project Goal:
 - to test 3 endpoints
 - to test all the data in the endpoint response
+- This project makes 26 unique API calls to endpoints and has 34 tests for the data points retrieved.
 
 ### Get Requests
 - GET inventory
