@@ -144,4 +144,19 @@ public class CreateAccountTest {
 
     }
 
+    @Test
+    @DisplayName("Add invalid account with empty fields")
+    void invalidAccountTest() {
+        Account invalidAccount = new Account(7, "", "", "", "", "", "", 2);
+        RequestSpecification postRequest = requestSpecBuilder()
+                .setBasePath(USER_PATH)
+                .build();
+        postRequest.body(invalidAccount);
+        result = RestAssured
+                .given(postRequest)
+                .when()
+                .post()
+                .then()
+                .spec(getJsonResponseWithStatus(200));
+    }
 }
